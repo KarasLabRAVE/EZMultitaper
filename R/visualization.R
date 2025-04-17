@@ -1,39 +1,3 @@
-# A plot function that takes a data frame and returns a heatmap plot
-makeHeatMap <- function(df, xTicksNum = 10){
-  xLabels <- colnames(df)
-  yLabels <- rownames(df)
-  
-  if(is.null(xLabels)){
-    xLabels <- seq_len(ncol(df))
-  }
-  if(is.null(yLabels)){
-    yLabels <- seq_len(nrow(df))
-  }
-  
-  df$y <- yLabels
-  df_long <- reshape2::melt(df, id.vars = "y", variable.name = "x", value.name = "value")
-  colnames(df_long) <- c("y", "x", "value")
-  
-  ## sort df_long by rownames(ERMatReorderd)
-  df_long$x <- factor(df_long$x, levels = xLabels)
-  df_long$y <- factor(df_long$y, levels = rev(yLabels))
-  ## show 10 time points on x-axis at most
-  if (length(xLabels) > xTicksNum){
-    step <- ceiling(length(xLabels) / xTicksNum)
-    breaksIdx <- seq(1, length(xLabels), by = step)
-    breaks <- xLabels[breaksIdx]
-  } else {
-    breaks <- xLabels
-  }
-  
-  ggplot2::ggplot(df_long) +
-    ggplot2::geom_tile(ggplot2::aes(x = .data$x, y = .data$y, fill = .data$value)) +
-    ggplot2::scale_x_discrete(labels = breaks, breaks = breaks) +
-    ggplot2::theme(plot.title = ggtext::element_markdown(hjust = 0.5)) +
-    viridis::scale_fill_viridis(option = "turbo") +
-    ggplot2::theme_minimal()
-}
-
 #' Visualization functions ( ER matrix)
 #'
 #' @description `plotERHeatmap`: plot epileptogenic ratio heatmaps with electrodes marked as soz colored
@@ -92,7 +56,6 @@ plotERHeatmap <- function(
   df <- as.data.frame(ERMat[allIndex, ])
   
   
-  
   makeHeatMap(df) +
     ggplot2::labs(x = xlabel, y = "Electrode", size = 2) +
     ggplot2::theme(
@@ -100,6 +63,51 @@ plotERHeatmap <- function(
     )
 }
 
+# A plot function that takes a data frame and returns a heatmap plot
+makeHeatMap <- function(df, xTicksNum = 10, yTicksNum = 10){
+  xLabels <- colnames(df)
+  yLabels <- rownames(df)
+  
+  if(is.null(xLabels)){
+    xLabels <- seq_len(ncol(df))
+  }
+  if(is.null(yLabels)){
+    yLabels <- seq_len(nrow(df))
+  }
+  
+  df$y <- yLabels
+  df_long <- reshape2::melt(df, id.vars = "y", variable.name = "x", value.name = "value")
+  colnames(df_long) <- c("y", "x", "value")
+  
+  ## sort df_long by rownames(fragMatReorderd)
+  df_long$x <- factor(df_long$x, levels = xLabels)
+  df_long$y <- factor(df_long$y, levels = rev(yLabels))
+  ## show 10 time points on x-axis at most
+  if (length(xLabels) > xTicksNum){
+    step <- ceiling(length(xLabels) / xTicksNum)
+    breaksIdx <- seq(1, length(xLabels), by = step)
+    breaks <- xLabels[breaksIdx]
+  } else {
+    breaks <- xLabels
+  }
+  
+  if (length(yLabels) > yTicksNum){
+    step <- ceiling(length(yLabels) / yTicksNum)
+    breaksIdy <- seq(1, length(yLabels), by = step)
+    breaksy <- yLabels[breaksIdy]
+  } else {
+    breaksy <- yLabels
+  }
+  
+  
+  ggplot2::ggplot(df_long) +
+    ggplot2::geom_tile(ggplot2::aes(x = .data$x, y = .data$y, fill = .data$value)) +
+    ggplot2::scale_x_discrete(labels = breaks, breaks = breaks) +
+    ggplot2::scale_y_discrete(labels = breaksy, breaks = breaksy) +
+    ggplot2::theme(plot.title = ggtext::element_markdown(hjust = 0.5)) +
+    viridis::scale_fill_viridis(option = "rocket") +
+    ggplot2::theme_minimal()
+}
 
 
 #' Visualization of ictal iEEG
