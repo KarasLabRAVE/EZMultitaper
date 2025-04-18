@@ -3,3 +3,8 @@ standardizeIEEG <- function(data) {
   plotData <- data / scaling
 }
 
+meanPowBaselineBand <- function(Band,spect, index){
+
+    
+  
+}

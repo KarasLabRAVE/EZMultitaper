@@ -64,7 +64,7 @@ plotERHeatmap <- function(
 }
 
 # A plot function that takes a data frame and returns a heatmap plot
-makeHeatMap <- function(df, xTicksNum = 10, yTicksNum = 10){
+makeHeatMapDiscretexy <- function(df, xTicksNum = 10, yTicksNum = 10){
   xLabels <- colnames(df)
   yLabels <- rownames(df)
   
