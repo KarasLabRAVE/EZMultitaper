@@ -10,8 +10,6 @@ windowParams<-c(0.25,0.1)
 epoch <- Epoch(pt01EcoG)
 visuIEEGData(epoch)
 
-
-
 # Set spectrogram parameters
 # define frequency bands
 deltaBand<-c(0.5,4)
@@ -22,21 +20,12 @@ gammaBand<-c(30,90)
 highGammaBand<-c(90,150)
 
 rangeBand<-betaBand
+powTimeWindow<-c(0,20)
+baseTimeWindow<-c(-30,-20)
 
-nwt=floor((timeNum/fs-windowParams[1])/windowParams[2])+1
-data   <- vector(mode="numeric", length=timeNum)
-data[1:timeNum]<-epoch$data[sozIndex[1],1:timeNum]
-# Compute the multitaper spectrogram
-results = multitaperSpectrogramR(data=data, fs=fs, windowParams = windowParams, frequencyRange=rangeBand)
+# compute the mean power analysis over the frequency band (rangeBand) over time window (powTimeWindow) and baselined time window (baseTimeWindow)
+betaBandPow<-meanPowBaselineBand( epoch=epoch, fs=fs, windowParams=windowParams, rangeBand=betaBand, powTimeWindow=powTimeWindow, baseTimeWindow=baseTimeWindow)
 
-
-# mean power analysis over the frequency band over time window (powTimeWindow) and based line time window (baseTimeWindow)
-spect<-results[[1]]
-timesOnset<-results[[2]]+timeWindow[1]
-endBaseIndex<-which.min(abs(timesOnset + 20))
-
-powRange=colSums(spect)
-# substract mean baseline t=[-30s:-20s]
-mBaseRange<-mean(powRange[1:endBaseIndex])
-powRange<-powRange-mBaseRange
-
+#rowNames(betaBandPow)<-rowNames(pt01EcoG)
+plotPowBand<-plotPowHeatmap(Pow=betaBandPow,sozIndex=sozIndex)
+plotPowBand
