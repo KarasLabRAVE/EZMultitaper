@@ -2,7 +2,7 @@
 #'
 #' @description `plotPowHeatmap`: plot power band heatmap with electrodes marked as soz colored
 #'
-#' @param Pow power object from 
+#' @param Pow MeanPowBand object from \code{meanPowBaselineBand}
 #' @param sozIndex Integer or string. A group of electrodes to mark as in the Seizure Onset Zone (SOZ)
 #' 
 #' @return A ggplot object
@@ -18,15 +18,15 @@
 #' @rdname plotPowHeatmap
 #' @export
 plotPowHeatmap <- function(
-    Pow,
+    pow,
     sozIndex = NULL) {
   ## TODO: make sozID an optional
   ## TODO: add plot support to Pow
-  PowMat <- Pow
+  PowMat <- pow$pow
   elecNum <- nrow(PowMat)
   windowNum <- ncol(PowMat)
   
-  elecNames <- rownames(PowMat)
+  elecNames <- pow$electrodes
   sozIndex <- checkIndex(sozIndex, elecNames)
   
   group1 <- sozIndex
@@ -35,7 +35,7 @@ plotPowHeatmap <- function(
   elecColor <- rep("blue", elecNum)
   elecColor[seq_along(group2)] <- "black"
   
-  startTime <- colnames(PowMat)
+  startTime <- pow$startTimes
   if (is.null(startTime)) {
     xlabel <- "Time Index"
     stimes <- seq_len(windowNum)
@@ -44,6 +44,7 @@ plotPowHeatmap <- function(
     stimes <- startTime
   }
   
+  rownames(PowMat) <- pow$electrodes
   colnames(PowMat) <- stimes
   
   ## prepare the data.frame for visualization

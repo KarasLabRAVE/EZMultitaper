@@ -4,7 +4,6 @@ timeWindow <- c(-30, 20)
 epoch <- Epoch(pt01EcoG)
 fs=1000
 sozIndex <- attr(pt01EcoG, "sozIndex")
-timeNum <- ncol(epoch)
 windowParams<-c(0.25,0.1)
 
 epoch <- Epoch(pt01EcoG)
@@ -26,6 +25,17 @@ baseTimeWindow<-c(-30,-20)
 # compute the mean power analysis over the frequency band (rangeBand) over time window (powTimeWindow) and baselined time window (baseTimeWindow)
 betaBandPow<-meanPowBaselineBand( epoch=epoch, fs=fs, windowParams=windowParams, rangeBand=betaBand, powTimeWindow=powTimeWindow, baseTimeWindow=baseTimeWindow)
 
-#rowNames(betaBandPow)<-rowNames(pt01EcoG)
-plotPowBand<-plotPowHeatmap(Pow=betaBandPow,sozIndex=sozIndex)
+plotPowBand<-plotPowHeatmap(pow=betaBandPow,sozIndex=sozIndex)
 plotPowBand
+
+
+############### test example 1
+
+data("pt01EcoG")
+fs<-1000
+windowParams<-c(0.25,0.1)
+betaBand<-c(13,30)
+powTimeWindow<-c(0,20)
+baseTimeWindow<-c(-30,-20)
+epoch <- Epoch(pt01EcoG)
+betaBandPow<-meanPowBaselineBand( epoch=epoch, fs=fs, windowParams=windowParams, rangeBand=betaBand, powTimeWindow=powTimeWindow, baseTimeWindow=baseTimeWindow)

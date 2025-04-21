@@ -1,6 +1,6 @@
 Package: EZMultitaper
 Type: Package
-Title: Compute multitaper transform for ictal iEEG time series
+Title: Compute mean power in a frequency range for ictal iEEG time series
 Version: 0.99.0
 Authors@R: 
     c(
@@ -30,7 +30,7 @@ Authors@R:
     comment = c(ORCID = "0000-0001-8288-6885"))
     )
 Maintainer: The package maintainer <aclesage@gmail.com>
-Description: For each electrode, it extracts the spectral power for six frequency bands  in a given frequency range for ictal iEEG time series
+Description: For each electrode, it extracts the mean spectral power a given frequency range for ictal iEEG time series
 License: GPL (>= 3) + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

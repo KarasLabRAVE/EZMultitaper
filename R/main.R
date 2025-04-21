@@ -3,20 +3,25 @@ standardizeIEEG <- function(data) {
   plotData <- data / scaling
 }
 
-#' Title
+#' compute the mean power analysis over the frequency band using the multitaper method
 #'
-#' @param epoch 
-#' @param fs 
-#' @param windowParams 
-#' @param rangeBand 
-#' @param powTimeWindow 
-#' @param baseTimeWindow 
+#' @param epoch Matrix or Epoch object. iEEG data matrix or Epoch object. If matrix, the row names are the electrode names and the column names are the time points
+#' @param fs Numeric. frequency of signal iEEG acquisition
+#' @param windowParams  Numeric. Window parameters of the multitaper method
+#' @param rangeBand Numeric. Frequency band of the multitaper power analysis
+#' @param powTimeWindow  Numeric. Time window around seizure onset of the power analysis
+#' @param baseTimeWindow Numeric. Time window around seizure onset to subtract the mean baselien signal
 #'
-#' @return
+#' @return A power analysis matrix
 #' @export
 #'
 #' @examples
-meanPowBaselineBand <- function(epoch, fs, windowParams, rangeBand, powTimeWindow, baseTimeWindow){
+#' data("pt01EcoG")
+#' windowParams<-c(0.25,0.1)
+#'betaBand<-c(13,30)
+#'epoch <- Epoch(pt01EcoG)
+#'betaBandPow<-meanPowBaselineBand( epoch=epoch, fs=1000, windowParams=windowParams, rangeBand=betaBand)
+meanPowBaselineBand <- function(epoch, fs=1000, windowParams, rangeBand, powTimeWindow=c(0,20), baseTimeWindow=c(-30,-20)){
 
   timeNum <- ncol(epoch)
   nwt=floor((timeNum/fs-windowParams[1])/windowParams[2])+1
@@ -26,7 +31,7 @@ meanPowBaselineBand <- function(epoch, fs, windowParams, rangeBand, powTimeWindo
   results = multitaperSpectrogramR(data=data, fs=fs, windowParams = windowParams, frequencyRange=rangeBand)
   stimes = results[[2]]
   
-  timesOnset<-results[[2]]+timeWindow[1]
+  timesOnset<-results[[2]]+epoch$times[1]
 
   startBaseIndex<-which.min(abs(timesOnset - baseTimeWindow[1]))
   endBaseIndex<-which.min(abs(timesOnset - baseTimeWindow[2]))
@@ -55,11 +60,12 @@ meanPowBaselineBand <- function(epoch, fs, windowParams, rangeBand, powTimeWindo
     powBandMaster[ie,1:length(timesOnset)]<-powBandOneElec[startEpochIndex:endEpochIndex]
     
   }
-  
-  rownames(powBandMaster)<-rownames(epoch)
-  colnames(powBandMaster)<-timesOnset
-  
-  powBandMaster
+
+  MeanPowBand(
+    pow = powBandMaster,
+    startTimes = timesOnset,
+    electrodes = epoch$electrodes
+  )
   
   
 }

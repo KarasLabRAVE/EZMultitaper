@@ -4,12 +4,12 @@
 \alias{plotPowHeatmap}
 \title{Visualization functions ( Pow matrix)}
 \usage{
-plotPowHeatmap(Pow, sozIndex = NULL)
+plotPowHeatmap(pow, sozIndex = NULL)
 }
 \arguments{
-\item{Pow}{power object from}
-
 \item{sozIndex}{Integer or string. A group of electrodes to mark as in the Seizure Onset Zone (SOZ)}
+
+\item{Pow}{MeanPowBand object from \code{meanPowBaselineBand}}
 }
 \value{
 A ggplot object
