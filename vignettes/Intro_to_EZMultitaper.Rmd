@@ -71,6 +71,7 @@ The parameter `sozIndex` accepts either electrode names or their indices in the 
 
 ```{r}
 plotPowBand<-plotPowHeatmap(pow=betaBandPow,sozIndex=sozIndex)
+plotPowBand<-plotPowBand+ggplot2::ggtitle(("Mean beta power heatmap for patient pt01"))
 plotPowBand
 ```
 
@@ -79,6 +80,7 @@ plotPowBand
 ```{r, out.width="100%"}
 ## plot the mean power quantiles
 plotbetaQuantile<-plotPowQuantile(pow = betaBandPow, sozIndex = sozIndex)
+plotbetaQuantile<-plotbetaQuantile+ggplot2::ggtitle(("Pooled mean beta power quantiles for patient pt01"))
 plotbetaQuantile
 ## plot the mean power distribution
 
@@ -86,4 +88,8 @@ plotbetaQuantile
 
 ```{r, out.width="100%"}
 plotBetaDistr<-plotPowDistribution(pow =betaBandPow, sozIndex = sozIndex)
+plotbetaDistr<-plotbetaDistr+ggplot2::ggtitle(("Pooled mean beta power distribution for patient pt01"))
 plotBetaDistr
+```
+
+

@@ -82,7 +82,6 @@ setMethod("[", "MeanPowBand", function(x, i, j, ..., drop = FALSE) {
   electrodes_subset <- x@electrodes[i]
   .MeanPowBand(
     pow = pow_subset,
-    lambdas = lambdas_subset,
     startTimes = startTimes_subset,
     electrodes = electrodes_subset
   )

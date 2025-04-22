@@ -50,15 +50,18 @@ data("pt01betaBandPow")
 
 ## plot the mean power heatmap
 plotPowBand<-plotPowHeatmap(pow = pt01betaBandPow, sozIndex = sozIndex)
+plotPowBand<-plotPowBand+ggplot2::ggtitle(("Mean beta power heatmap for patient pt01"))
 plotPowBand
 
 ## plot the mean power quantiles
 plotbetaQuantile<-plotPowQuantile(pow = pt01betaBandPow, sozIndex = sozIndex)
+plotbetaQuantile<-plotbetaQuantile+ggplot2::ggtitle(("Pooled mean beta power quantiles for patient pt01"))
 plotbetaQuantile
 
 ## plot the mean power distribution
-plotBetaDistr<-plotPowDistribution(pow = pt01betaBandPow, sozIndex = sozIndex)
-plotBetaDistr
+plotbetaDistr<-plotPowDistribution(pow = pt01betaBandPow, sozIndex = sozIndex)
+plotbetaDistr<-plotbetaDistr+ggplot2::ggtitle(("Pooled mean beta power distribution for patient pt01"))
+plotbetaDistr
 
 ############# test example 3
 data("pt01betaBandPow")
