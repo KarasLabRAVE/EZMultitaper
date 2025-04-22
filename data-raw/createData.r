@@ -31,6 +31,23 @@ attr(pt01EcoG, "sozIndex") <- sozIndex
 attr(pt01EcoG, "sozNames") <- sozNames
 usethis::use_data(pt01EcoG, overwrite = TRUE)
 
+betaBand<-c(13,30) 
+
+rangeBand<-betaBand
+powTimeWindow<-c(0,20)
+baseTimeWindow<-c(-30,-20)
+fs=1000
+windowParams<-c(0.25,0.1)
+epoch <- Epoch(pt01EcoG)
+
+
+# compute the mean power analysis over the frequency band (rangeBand) over time window (powTimeWindow) and baselined time window (baseTimeWindow)
+pt01betaBandPow<-meanPowBaselineBand( epoch=epoch, fs=fs, windowParams=windowParams, rangeBand=betaBand, 
+                                  powTimeWindow=powTimeWindow, baseTimeWindow=baseTimeWindow)
+
+usethis::use_data(pt01betaBandPow, overwrite = TRUE)
+
+
 
 
 

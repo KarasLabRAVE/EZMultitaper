@@ -13,8 +13,12 @@
 #' 
 #' ## sozIndex is the index of the electrodes we assume are in the SOZ
 #' sozIndex <- attr(pt01EcoG, "sozIndex")
+#' ## precomputed meanPowBand object
+#' data("pt01betaBandPow")
 #' 
-
+#' ## plot the mean power heatmap
+#' plotPowBand<-plotPowHeatmap(pow=betaBandPow,sozIndex=sozIndex)
+#' plotPowBand
 #' @rdname plotPowHeatmap
 #' @export
 plotPowHeatmap <- function(
@@ -202,4 +206,107 @@ visuIEEGData <- function(epoch) {
   p +
     ggplot2::labs(x = xlabel, y = "Electrode", size = 2) +
     ggplot2::scale_y_continuous(labels = elecNamesReversed, breaks = breakplot)
+}
+
+#' @description `plotPowQuantile`: Plot mean power time quantiles for two electrodes group marked as SOZ and reference
+#' 
+#' @rdname plotPowHeatmap
+#' @examples
+#' ## plot the mean power quantiles
+#' plotbetaQuantile<-plotPowQuantile(pow = pt01betaBandPow, sozIndex = sozIndex)
+#' plotbetaQuantile
+#' @export
+plotPowQuantile <- function(pow, sozIndex = NULL) {
+  sozIndex <- checkIndex(sozIndex, pow$electrodes)
+  if (is.null(sozIndex)) {
+    sozIndex <- estimateSOZ(pow)
+  }
+  windowNum <- ncol(pow)
+  
+  stat <- powStat(pow, sozIndex)
+  qmatrix <- as.data.frame(stat$qmatrix)
+  
+  startTimes <- pow$startTimes
+  if (is.null(startTimes)) {
+    xlabel <- "Time Index"
+    timeTicks <- seq_len(windowNum)
+  } else {
+    xlabel <- "Time (s)"
+    timeTicks <- startTimes
+  }
+  
+  colnames(qmatrix) <- timeTicks
+  
+  makeHeatMap(qmatrix)+
+    ggplot2::labs(x = xlabel, y = "Quantiles", size = 2) +
+    ggplot2::theme(
+      axis.text.y = ggplot2::element_text(size = 4), # Adjust depending on electrodes
+    )
+}
+
+
+#' @description `plotPowDistribution`: Plot mean power time distribution for two electrodes group marked as SOZ and reference
+#' 
+#' @rdname plotPowHeatmap
+#' @examples
+#' ## plot the mean power distribution
+#' plotBetaDistr<-plotPowDistribution(pow = pt01betaBandPow, sozIndex = sozIndex)
+#' plotBetaDistr
+#' @export
+plotPowDistribution <- function(pow, sozIndex = NULL) {
+  if (is.null(sozIndex)) {
+    sozIndex <- estimateSOZ(pow)
+  }
+  
+  sozIndex <- checkIndex(sozIndex, pow$electrodes)
+  
+  powMat <- pow$pow
+  windowNum <- ncol(powMat)
+  
+  SOZMat <- powMat[sozIndex, , drop = FALSE]
+  RefMat <- powMat[-sozIndex, , drop = FALSE]
+  
+  meanSOZ <- apply(SOZMat, 2, mean, na.rm = TRUE)
+  semSOZ <- apply(SOZMat, 2, function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x))))
+  
+  meanRef <- apply(RefMat, 2, mean, na.rm = TRUE)
+  semRef <- apply(RefMat, 2, function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x))))
+  
+  startTimes <- pow$startTimes
+  if (is.null(startTimes)) {
+    xlabel <- "Time Index"
+    timeTicks <- seq_len(windowNum)
+  } else {
+    xlabel <- "Time (s)"
+    timeTicks <- startTimes
+  }
+  
+  upperSOZ <- meanSOZ + semSOZ
+  lowerSOZ <- meanSOZ - semSOZ
+  upperRef <- meanRef + semRef
+  lowerRef <- meanRef - semRef
+  
+  plotData <- data.frame(
+    timeTicks = timeTicks,
+    meanSOZ = meanSOZ,
+    upperSOZ = upperSOZ,
+    lowerSOZ = lowerSOZ,
+    meanRef = meanRef,
+    upperRef = upperRef,
+    lowerRef = lowerRef
+  )
+  
+  colors <- c("SOZ +/- sem" = "red", "SOZc +/- sem" = "black")
+  ggplot2::ggplot(plotData, ggplot2::aes(x = .data$timeTicks)) +
+    ggplot2::xlab(xlabel) +
+    ggplot2::ylab("Mean Power") +
+    ggplot2::geom_line(ggplot2::aes(y = .data$meanSOZ, color = "SOZ +/- sem")) +
+    ggplot2::geom_line(ggplot2::aes(y = .data$upperSOZ), color = "red", linetype = "dotted") +
+    ggplot2::geom_line(ggplot2::aes(y = .data$lowerSOZ), color = "red", linetype = "dotted") +
+    ggplot2::geom_line(ggplot2::aes(y = .data$meanRef, color = "SOZc +/- sem")) +
+    ggplot2::geom_line(ggplot2::aes(y = .data$upperRef), color = "black", linetype = "dotted") +
+    ggplot2::geom_line(ggplot2::aes(y = .data$lowerRef), color = "black", linetype = "dotted") +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lowerSOZ, ymax = .data$upperSOZ), fill = "red", alpha = 0.5) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lowerRef, ymax = .data$upperRef), fill = "black", alpha = 0.5) +
+    ggplot2::scale_color_manual(name = "Electrode groups", values = c(colors))
 }

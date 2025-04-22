@@ -18,12 +18,12 @@ MeanPowBand<- function(pow, startTimes, electrodes) {
 }
 
 
-#' @rdname cash-FragStat-method
+#' @rdname cash-PowStat-method
 setMethod("$", "MeanPowBand", function(x, name) {
   slot(x, name)
 })
 
-#' @rdname cash-FragStat-method
+#' @rdname cash-PowStat-method
 setMethod("$<-", "MeanPowBand", function(x, name, value) {
   slot(x, name) <- value
   invisible(x)

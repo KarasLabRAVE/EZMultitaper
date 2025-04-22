@@ -39,3 +39,29 @@ powTimeWindow<-c(0,20)
 baseTimeWindow<-c(-30,-20)
 epoch <- Epoch(pt01EcoG)
 betaBandPow<-meanPowBaselineBand( epoch=epoch, fs=fs, windowParams=windowParams, rangeBand=betaBand, powTimeWindow=powTimeWindow, baseTimeWindow=baseTimeWindow)
+ 
+############### test example 2
+data("pt01EcoG")
+
+## sozIndex is the index of the electrodes we assume are in the SOZ
+sozIndex <- attr(pt01EcoG, "sozIndex")
+## precomputed MeanPowBand object
+data("pt01betaBandPow")
+
+## plot the mean power heatmap
+plotPowBand<-plotPowHeatmap(pow = pt01betaBandPow, sozIndex = sozIndex)
+plotPowBand
+
+## plot the mean power quantiles
+plotbetaQuantile<-plotPowQuantile(pow = pt01betaBandPow, sozIndex = sozIndex)
+plotbetaQuantile
+
+## plot the mean power distribution
+plotBetaDistr<-plotPowDistribution(pow = pt01betaBandPow, sozIndex = sozIndex)
+plotBetaDistr
+
+############# test example 3
+data("pt01betaBandPow")
+data("pt01EcoG")
+sozIndex <- attr(pt01EcoG, "sozIndex")
+pt01PowStat <- powStat(pow = pt01betaBandPow, sozIndex = sozIndex)
