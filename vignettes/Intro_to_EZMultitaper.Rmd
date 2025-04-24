@@ -88,7 +88,7 @@ plotbetaQuantile
 
 ```{r, out.width="100%"}
 plotBetaDistr<-plotPowDistribution(pow =betaBandPow, sozIndex = sozIndex)
-plotbetaDistr<-plotbetaDistr+ggplot2::ggtitle(("Pooled mean beta power distribution for patient pt01"))
+plotBetaDistr<-plotBetaDistr+ggplot2::ggtitle(("Pooled mean beta power distribution for patient pt01"))
 plotBetaDistr
 ```
 
