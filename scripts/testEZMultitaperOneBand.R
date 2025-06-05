@@ -14,6 +14,9 @@ display <- c(sozIndex, 77:80)
 pt01sz1m30p20s14e<-pt01sz1m30p20s[display,]
 sozIndex14e<-which(pt01sz1m30p20s14e@rowData$soz==TRUE)
 
+# in this package visuiEEG uses the epoch package
+visuIEEGData(epoch=pt01sz1m30p20s14e)
+
 # Set spectrogram parameters
 # define frequency bands
 deltaBand<-c(0.5,4)
