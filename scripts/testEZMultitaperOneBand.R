@@ -16,10 +16,13 @@ pt01sz1
 
 # crop
 pt01sz1Cropped<-crop(pt01sz1, start=-30, end=20)
+gainInput=0.5
 
+# 120925 Load and build Epoch Package
+# from https://github.com/KarasLabRAVE/Epoch/tree/devel-cecile
 # Change gain
-visualSOZ <- function(epoch, sozNames) {
-  p <- plot(epoch)
+visualSOZ <- function(epoch, sozNames, gainInput) {
+  p <- plot(epoch,gain=gainInput)
 
   elecColor <- rep("black", nrow(epoch))
   elecColor[rownames(epoch) %in% sozNames] <- 'red'
@@ -35,7 +38,7 @@ pt01sozName <- rownames(pt01sz1Cropped)[rowData(pt01sz1Cropped)$soz]
 pt01Display <- c(pt01sozName, "MLT1", "MLT2", "MLT3", "MLT4")
 pt01sz1Reordered <- pt01sz1Cropped[pt01Display, ]
 
-visualSOZ(pt01sz1Reordered, pt01sozName)
+visualSOZ(pt01sz1Reordered, pt01sozName,gainInput)
 
 #Set spectrogram parameters
 #define frequency bands
@@ -58,10 +61,28 @@ windowParams<-c(0.25,0.1)
 # compute the mean power analysis over the frequency band (rangeBand) over time window (powTimeWindow) and baselined time window (baseTimeWindow)
 betaBandPow<-meanPowBaselineBand( epoch=pt01sz1Reordered, fs=fs, windowParams=windowParams, rangeBand=betaBand, powTimeWindow=powTimeWindow, baseTimeWindow=baseTimeWindow)
 
-## plot the mean power heatmap
-plotPowBand<-plotPowHeatmap(pow = betaBandPow)
-plotPowBand<-plotPowBand+ggplot2::ggtitle(("Mean beta power heatmap for patient pt01"))
-plotPowBand
+powMat <- betaBandPow$pow
+colnames(powMat) <- round(betaBandPow$startTimes,digits=1)
+
+# power heatmap with the same display options as the previous voltage plot. Looking at both plots allows to check correlation between soz patterns
+powHeatmap <- function(pow, sozNames) {
+  startTimes <- pow$startTimes
+
+  indexsz <- which(abs(startTimes)<=0.01)
+  elecColor <- rep("black", length(pow$electrodes))
+  elecColor[pow$electrodes%in% sozNames] <- 'red'
+  elecColor <- rev(elecColor)
+
+  plot(pow)+
+    geom_vline(xintercept = indexsz, color = "black", linetype = "dashed", linewidth = 1) +
+    theme(
+      axis.text.y = element_markdown(colour = elecColor)
+    )
+}
+
+
+
+powHeatmap(betaBandPow, pt01sozName)
 
 # ## plot the mean power quantiles
 # plotbetaQuantile<-plotPowQuantile(pow = betaBandPow)
