@@ -3,7 +3,6 @@
 export(meanPowBaselineBand)
 export(multitaperSpectrogramR)
 export(plotPowDistribution)
-export(plotPowQuantile)
 export(powStat)
 export(process_spectrogram_params)
 exportMethods("$")

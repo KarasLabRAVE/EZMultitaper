@@ -2,10 +2,13 @@ PowStat <- setClass(
     "PowStat",
     slots = list(
         qmatrix = "matrixOrNULL",
-        meanSOZ = "numericOrNULL",
-        meanRef = "numericOrNULL",
-        sdSOZ = "numericOrNULL",
-        sdRef = "numericOrNULL"
+        groupMean  = "numericOrNULL",
+        refMean ="numericOrNULL",
+        groupSD    = "numericOrNULL",
+        refSD   = "numericOrNULL",
+        groupSEM   = "numericOrNULL",
+        refSEM = "numericOrNULL"
+
     )
 )
 

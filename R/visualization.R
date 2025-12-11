@@ -114,25 +114,54 @@ setMethod("plot", signature(x = "MeanPowBand", y = "missing"),
 
 
 
-
-
-#' @description `plotPowQuantile`: Plot mean power time quantiles for two electrodes group marked as SOZ and reference
-#'
-#' @rdname plotPowHeatmap
+#' @description `plotPowDistribution`: Plot power time distribution for two electrodes groups
+#' @param bandType Character. The type of band to use, either "SEM" or "SD". Default is "SEM".
+#' @param rollingWindow Integer. Window size for rolling average smoothing. Default is 1 (no smoothing).
+#' @rdname plotFrag
 #' @examples
-#' ## plot the mean power quantiles
-#' plotbetaQuantile<-plotPowQuantile(pow = pt01betaBandPow, sozIndex = sozIndex)
-#' plotbetaQuantile
+#' ## plot the fragility distribution
+#'
 #' @export
-plotPowQuantile <- function(pow, sozIndex = NULL) {
-  sozIndex <- checkIndex(sozIndex, pow$electrodes)
-  if (is.null(sozIndex)) {
-    sozIndex <- estimateSOZ(pow)
+plotPowDistribution <- function(
+    pow, groupIndex = NULL,
+    groupName="SOZ", bandType = c("SEM", "SD"),
+    rollingWindow = 1, ranked=FALSE,
+    x.lab.size = 10,
+    y.lab.size = 10) {
+  bandType <- match.arg(bandType)
+  if (is.null(groupIndex)) {
+    groupIndex <- estimateSOZ(pow)
   }
-  windowNum <- ncol(pow)
+  groupIndex <- checkIndex(groupIndex, pow$electrodes)
 
-  stat <- powStat(pow, sozIndex)
-  qmatrix <- as.data.frame(stat$qmatrix)
+  windowNum <- ncol(pow$pow)
+  stat <- powStat(
+    pow,
+    groupIndex = groupIndex
+  )
+
+  groupMean <- stat$groupMean
+  refMean <- stat$refMean
+  if (bandType == "SEM") {
+    groupWidth <- stat$groupSEM
+    refWidth <- stat$refSEM
+  } else if (bandType == "SD") {
+    groupWidth <- stat$groupSD
+    refWidth <- stat$refSD
+  }
+
+  ## Apply rolling average smoothing if requested
+  if (rollingWindow > 1) {
+    groupMean <- rolling_mean(groupMean, rollingWindow)
+    refMean <- rolling_mean(refMean, rollingWindow)
+    groupWidth <- rolling_mean(groupWidth, rollingWindow)
+    refWidth <- rolling_mean(refWidth, rollingWindow)
+  }
+
+  groupUpperBound <- groupMean + groupWidth
+  groupLowerBound <- groupMean - groupWidth
+  refUpperBound <- refMean + refWidth
+  refLowerBound <- refMean - refWidth
 
   startTimes <- pow$startTimes
   if (is.null(startTimes)) {
@@ -143,78 +172,38 @@ plotPowQuantile <- function(pow, sozIndex = NULL) {
     timeTicks <- startTimes
   }
 
-  colnames(qmatrix) <- timeTicks
-
-  makeHeatMap(qmatrix)+
-    ggplot2::labs(x = xlabel, y = "Quantiles", size = 2) +
-    ggplot2::theme(
-      axis.text.y = ggplot2::element_text(size = 4), # Adjust depending on electrodes
-    )
-}
-
-
-#' @description `plotPowDistribution`: Plot mean power time distribution for two electrodes group marked as SOZ and reference
-#'
-#' @rdname plotPowHeatmap
-#' @examples
-#' ## plot the mean power distribution
-#' plotBetaDistr<-plotPowDistribution(pow = pt01betaBandPow, sozIndex = sozIndex)
-#' plotBetaDistr
-#' @export
-plotPowDistribution <- function(pow, sozIndex = NULL) {
-  if (is.null(sozIndex)) {
-    sozIndex <- estimateSOZ(pow)
-  }
-
-  sozIndex <- checkIndex(sozIndex, pow$electrodes)
-
-  powMat <- pow$pow
-  windowNum <- ncol(powMat)
-
-  SOZMat <- powMat[sozIndex, , drop = FALSE]
-  RefMat <- powMat[-sozIndex, , drop = FALSE]
-
-  meanSOZ <- apply(SOZMat, 2, mean, na.rm = TRUE)
-  semSOZ <- apply(SOZMat, 2, function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x))))
-
-  meanRef <- apply(RefMat, 2, mean, na.rm = TRUE)
-  semRef <- apply(RefMat, 2, function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x))))
-
-  startTimes <- pow$startTimes
-  if (is.null(startTimes)) {
-    xlabel <- "Time Index"
-    timeTicks <- seq_len(windowNum)
-  } else {
-    xlabel <- "Time (s)"
-    timeTicks <- startTimes
-  }
-
-  upperSOZ <- meanSOZ + semSOZ
-  lowerSOZ <- meanSOZ - semSOZ
-  upperRef <- meanRef + semRef
-  lowerRef <- meanRef - semRef
 
   plotData <- data.frame(
     timeTicks = timeTicks,
-    meanSOZ = meanSOZ,
-    upperSOZ = upperSOZ,
-    lowerSOZ = lowerSOZ,
-    meanRef = meanRef,
-    upperRef = upperRef,
-    lowerRef = lowerRef
+    groupMean = groupMean,
+    groupUpperBound = groupUpperBound,
+    groupLowerBound = groupLowerBound,
+    refMean = refMean,
+    refUpperBound = refUpperBound,
+    refLowerBound = refLowerBound
   )
 
-  colors <- c("SOZ +/- sem" = "red", "SOZc +/- sem" = "black")
-  ggplot2::ggplot(plotData, ggplot2::aes(x = .data$timeTicks)) +
-    ggplot2::xlab(xlabel) +
-    ggplot2::ylab("Mean Power") +
-    ggplot2::geom_line(ggplot2::aes(y = .data$meanSOZ, color = "SOZ +/- sem")) +
-    ggplot2::geom_line(ggplot2::aes(y = .data$upperSOZ), color = "red", linetype = "dotted") +
-    ggplot2::geom_line(ggplot2::aes(y = .data$lowerSOZ), color = "red", linetype = "dotted") +
-    ggplot2::geom_line(ggplot2::aes(y = .data$meanRef, color = "SOZc +/- sem")) +
-    ggplot2::geom_line(ggplot2::aes(y = .data$upperRef), color = "black", linetype = "dotted") +
-    ggplot2::geom_line(ggplot2::aes(y = .data$lowerRef), color = "black", linetype = "dotted") +
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lowerSOZ, ymax = .data$upperSOZ), fill = "red", alpha = 0.5) +
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lowerRef, ymax = .data$upperRef), fill = "black", alpha = 0.5) +
-    ggplot2::scale_color_manual(name = "Electrode groups", values = c(colors))
+  groupColor <- glue::glue("{groupName} +/- {bandType}")
+  refColor <- glue::glue("REF +/- {bandType}")
+  colors <- setNames(c("red", "black"), c(groupColor, refColor))
+
+  ggplot(plotData, aes(x = .data$timeTicks)) +
+    xlab(xlabel) +
+    ylab("Mean Band Power") +
+    geom_line(
+      aes(y = .data$groupMean, color = groupColor)
+    ) +
+    geom_line(aes(y = .data$groupUpperBound), color = "red", linetype = "blank") +
+    geom_line(aes(y = .data$groupLowerBound), color = "red", linetype = "blank") +
+    geom_line(aes(y = .data$refMean, color = refColor)) +
+    geom_line(aes(y = .data$refUpperBound), color = "black", linetype = "blank") +
+    geom_line(aes(y = .data$refLowerBound), color = "black", linetype = "blank") +
+    geom_ribbon(aes(ymin = .data$groupLowerBound, ymax = .data$groupUpperBound), fill = "red", alpha = 0.5) +
+    geom_ribbon(aes(ymin = .data$refLowerBound, ymax = .data$refUpperBound), fill = "black", alpha = 0.5) +
+    scale_color_manual(name = "Electrode groups", values = c(colors))+
+    theme(
+      axis.text.y = element_text(size = y.lab.size),
+      axis.text.x = element_text(size = x.lab.size)
+    )
+
 }

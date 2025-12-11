@@ -80,9 +80,15 @@ powHeatmap <- function(pow, sozNames) {
     )
 }
 
-
-
 powHeatmap(betaBandPow, pt01sozName)
+
+powDist <- function(pow, sozNames) {
+  timeWindows <- pow$startTimes
+  plotPowDistribution(pow = pow, groupIndex = sozNames, bandType="SEM", rollingWindow = 1) +
+    geom_vline(xintercept = 0, color = "black", linetype = "dashed", linewidth = 1)
+}
+
+powDist(betaBandPow , pt01sozName)
 
 # ## plot the mean power quantiles
 # plotbetaQuantile<-plotPowQuantile(pow = betaBandPow)
