@@ -64,7 +64,8 @@ betaBandPow<-meanPowBaselineBand( epoch=pt01sz1Reordered, fs=fs, windowParams=wi
 powMat <- betaBandPow$pow
 colnames(powMat) <- round(betaBandPow$startTimes,digits=1)
 
-# power heatmap with the same display options as the previous voltage plot. Looking at both plots allows to check correlation between soz patterns
+# power heatmap with the same display options as the previous voltage plot.
+# Looking at both plots allows to check correlation between soz patterns
 powHeatmap <- function(pow, sozNames) {
   startTimes <- pow$startTimes
 
@@ -74,7 +75,7 @@ powHeatmap <- function(pow, sozNames) {
   elecColor <- rev(elecColor)
 
   plot(pow)+
-    geom_vline(xintercept = indexsz, color = "black", linetype = "dashed", linewidth = 1) +
+   # geom_vline(xintercept = indexsz, color = "black", linetype = "dashed", linewidth = 1) +
     theme(
       axis.text.y = element_markdown(colour = elecColor)
     )
@@ -82,22 +83,7 @@ powHeatmap <- function(pow, sozNames) {
 
 powHeatmap(betaBandPow, pt01sozName)
 
-powDist <- function(pow, sozNames) {
-  timeWindows <- pow$startTimes
-  plotPowDistribution(pow = pow, groupIndex = sozNames, bandType="SEM", rollingWindow = 1) +
-    geom_vline(xintercept = 0, color = "black", linetype = "dashed", linewidth = 1)
-}
+## plot the mean band power distribution
+plotPowDistribution(pow = betaBandPow, groupIndex = pt01sozName, bandType="SEM", rollingWindow = 1)
 
-powDist(betaBandPow , pt01sozName)
-
-# ## plot the mean power quantiles
-# plotbetaQuantile<-plotPowQuantile(pow = betaBandPow)
-# plotbetaQuantile<-plotbetaQuantile+ggplot2::ggtitle(("Pooled mean beta power quantiles for patient pt01"))
-# plotbetaQuantile
-#
-# ## plot the mean power distribution
-# plotbetaDistr<-plotPowDistribution(pow = betaBandPow, sozIndex = sozIndex14e)
-# plotbetaDistr<-plotbetaDistr+ggplot2::ggtitle(("Pooled mean beta power distribution for patient pt01"))
-# plotbetaDistr
-#
-# pt01PowStat <- powStat(pow = betaBandPow, sozIndex = sozIndex14e)
+plotPowQuantile(pow = betaBandPow, groupIndex = pt01sozName)

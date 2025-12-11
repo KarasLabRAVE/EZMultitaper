@@ -117,9 +117,9 @@ setMethod("plot", signature(x = "MeanPowBand", y = "missing"),
 #' @description `plotPowDistribution`: Plot power time distribution for two electrodes groups
 #' @param bandType Character. The type of band to use, either "SEM" or "SD". Default is "SEM".
 #' @param rollingWindow Integer. Window size for rolling average smoothing. Default is 1 (no smoothing).
-#' @rdname plotFrag
+#' @rdname plotPow
 #' @examples
-#' ## plot the fragility distribution
+#' ## plot the mean band power distribution
 #'
 #' @export
 plotPowDistribution <- function(
@@ -206,4 +206,47 @@ plotPowDistribution <- function(
       axis.text.x = element_text(size = x.lab.size)
     )
 
+}
+
+#' @description `plotPowQuantile`: Plot mean power time quantiles for two electrodes groups
+#'
+#' @rdname plotPow
+#' @examples
+#' ## plot the mean power quantiles
+#' plotPowQuantile(Pow = pt01Pow, groupIndex = sozNames)
+#'
+#' @export
+plotPowQuantile <- function(pow, groupIndex = NULL, groupName = "SOZ",
+                             x.lab.size = 10,
+                             y.lab.size = 10) {
+  if (is.null(groupIndex)) {
+    groupIndex <- estimateSOZ(pow)
+  }
+  groupIndex <- checkIndex(groupIndex, pow$electrodes)
+  windowNum <- ncol(pow)
+
+  stat <- powStat(
+    pow,
+    groupIndex = groupIndex,
+    groupName = groupName
+  )
+  qmatrix <- as.data.frame(stat$qmatrix)
+
+  startTimes <- round(pow$startTimes,digits=1)
+  if (is.null(startTimes)) {
+    xlabel <- "Time Index"
+    timeTicks <- seq_len(windowNum)
+  } else {
+    xlabel <- "Time (s)"
+    timeTicks <- startTimes
+  }
+
+  colnames(qmatrix) <- timeTicks
+
+  makeHeatMap(qmatrix)+
+    labs(x = xlabel, y = "Quantiles") +
+    theme(
+      axis.text.y = element_text(size = y.lab.size),
+      axis.text.x = element_text(size = x.lab.size)
+    )
 }

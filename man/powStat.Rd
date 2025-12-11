@@ -2,25 +2,27 @@
 % Please edit documentation in R/powStat.r
 \name{powStat}
 \alias{powStat}
-\title{Compute quantiles, mean and standard deviation for two electrodes group marked as soz non marked as soz}
+\title{Compute quantiles, mean and standard deviation for two electrodes groups}
 \usage{
-powStat(pow, sozIndex)
+powStat(pow, groupIndex = NULL, groupName = "SOZ")
 }
 \arguments{
-\item{pow}{Matrix or mean power object. Either a matrix with row as Electrode names and Column as power index,
-or a MeanPowBand object from \code{meanPowBaselineBand}}
+\item{pow}{MeanPowBand object from \code{meanPowBaselineBand}}
 
-\item{sozIndex}{Integer.  Vector soz electrodes (for good electrodes)}
+\item{groupIndex}{Integer or string. A group of electrodes to mark}
+
+\item{groupName}{Character. Name of the group of electrodes, default is "SOZ"}
 }
 \value{
 list of 5 items with quantile matrix, mean and sdv from both electrodes groups
 }
 \description{
-Compute quantiles, mean and standard deviation for two electrodes group marked as soz non marked as soz
+Compute quantiles, mean and standard deviation for two electrodes groups
 }
 \examples{
-data("pt01betaBandPow")
+data("pt01Frag")
 data("pt01EcoG")
-sozIndex <- attr(pt01EcoG, "sozIndex")
-pt01powstat <- powStat(pow = pt01betaBandPow, sozIndex = sozIndex)
+## sozNames is the name of the electrodes we assume are in the SOZ
+sozNames <- metaData(pt01EcoG)$sozNames
+pt01fragstat <- fragStat(frag = pt01Frag, groupIndex = sozNames)
 }
