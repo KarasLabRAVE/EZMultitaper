@@ -115,4 +115,4 @@ powHeatmap <- function(heatmap, sozNames) {
     )
 }
 
-powHeatmap(heatmap=MeanPowBandHeatmaps[[1]], pt01sozName)
+powHeatmap(heatmap=MeanPowBandHeatmaps[[1]], sozNames=pt01sozName)
