@@ -33,9 +33,26 @@ A power analysis matrix
 compute the mean power analysis over the frequency band using the multitaper method
 }
 \examples{
-data("pt01EcoG")
-windowParams<-c(0.25,0.1)
+# access package Data in OSF
+dl<-EpochDownloader(progress = FALSE)
+names(dl)
+# test EZMultitaper with Epoch package
+# data download one patient one seizure
+pt01sz1 <- dl$FragilityData_subpt01_1
+pt01sz1
+# crop
+pt01sz1Cropped<-crop(pt01sz1, start=-30, end=20)
+# select small number of channel
+pt01sozName <- rownames(pt01sz1Cropped)[rowData(pt01sz1Cropped)$soz]
+pt01Display <- c(pt01sozName, "MLT1", "MLT2", "MLT3", "MLT4")
+pt01sz1Reordered <- pt01sz1Cropped[pt01Display, ]
 betaBand<-c(13,30)
-epoch <- Epoch(pt01EcoG)
-betaBandPow<-meanPowBaselineBand( epoch=epoch, fs=1000, windowParams=windowParams, rangeBand=betaBand)
+rangeBand<-betaBand
+powTimeWindow<-c(0,20)
+baseTimeWindow<-c(-30,-20)
+meta<-metaData(pt01sz1Reordered)
+fs<-metaData(pt01sz1Reordered)$samplingRate
+windowParams<-c(0.25,0.1)
+# compute the mean power analysis over the frequency band (rangeBand) over time window (powTimeWindow) and baselined time window (baseTimeWindow)
+betaBandPow<-meanPowBaselineBand( epoch=pt01sz1Reordered, fs=fs, windowParams=windowParams, rangeBand=betaBand, powTimeWindow=powTimeWindow, baseTimeWindow=baseTimeWindow)
 }

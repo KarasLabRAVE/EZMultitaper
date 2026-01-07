@@ -1,12 +1,12 @@
-#' Multitaper Spectrogram functions 
+#' Multitaper Spectrogram functions
 #'
 #' Compute multitaper spectrogram of timeseries data
-#' 
-#' This R script contains the R implementations of the multitaper spectrogram analysis described in the paper "Sleep Neurophysiological Dynamics Through the 
-#' Lens of Multitaper Spectral Analysis". 
+#'
+#' This R script contains the R implementations of the multitaper spectrogram analysis described in the paper "Sleep Neurophysiological Dynamics Through the
+#' Lens of Multitaper Spectral Analysis".
 #' Multitaper spectral estimation, which was developed in the early 1980
 #' s by David Thomson2 and has been shown to have superior statistical properties compared with single-taper spectral estimates
-#' 
+#'
 #' https://github.com/preraulab/multitaper_toolbox
 #'
 #' Results tend to agree with Prerau Lab python implementation of multitaper spectrogram with precision on the order of at most
@@ -18,9 +18,9 @@
 #'                                           c(0, nyquist) later)
 #' @param timeBandwidth (numeric): time-half bandwidth product (window duration*half bandwidth of main lobe)
 #'                                   (default: 5 Hz*s)
-#' @param numTapers (numeric): number of DPSS tapers to use (default: NULL [will be computed
-#'                                                               as floor(2*time_bandwidth - 1)])
-#' @param windowParams  (numeric vector): c(window size (seconds), step size (seconds)) (default: [5 1])
+#' @param numTapers (numeric): number of DPSS tapers to use (default: NULL will be computed
+#'                                                               as floor(2*time_bandwidth - 1))
+#' @param windowParams  (numeric vector): c(window size (seconds), step size (seconds)) (default: 5 1)
 #' @param minNfft (numeric) minimum allowable NFFT size, adds zero padding for interpolation (closest 2^x) (default: 0)
 #' @param weighting (char) weighting of tapers ('unity' (default), 'eigen', 'adapt')
 #' @param detrendOpt (char): detrend data window ('linear' (default), 'constant', 'off')
@@ -29,7 +29,7 @@
 #         num_workers (numeric): number of cpus/workers to dedicate to parallel processing (default: FALSE). Note: Will
 #                                be ignored if parallel is FALSE. If parallel is TRUE and num_workers is false (or if num_workers
 #                                exceeds available workers), will default to max number of workers available minus 1.
-#' @param numWorkers (logical): plot results (default: TRUE)
+#' @param numWorkers (logical): number of workers
 #' @param plotOn (logical): plot results (default: TRUE)
 #' @param verbose (logical): display spectrogram properties (default: TRUE)
 #' @param xyflip ((logical): return the transpose of mt_spectrogram)
@@ -47,7 +47,7 @@
 #'epoch <- Epoch(pt01EcoG)
 #' fs=1000
 #' timeNum <- ncol(epoch)
-#'windowParams = c(1, 0.2) 
+#'windowParams = c(1, 0.2)
 #' nwt=floor((timeNum/fs-windowParams[1])/windowParams[2])+1
 #' data   <- vector(mode="numeric", length=timeNum)
 #' data[1:timeNum]<-dataMat[sozIndex[1],1:timeNum]
@@ -58,7 +58,7 @@ multitaperSpectrogramR <- function(data, fs, frequencyRange=c(0.5,250), timeBand
                                      minNfft=0, weighting='unity', detrendOpt='off', parallel=FALSE, numWorkers=3,
                                      plotOn=FALSE, verbose=FALSE, xyflip=FALSE){
  # returns:
-  
+
   # Process user input
   res <- process_input(data, fs, frequencyRange, timeBandwidth, numTapers, windowParams, minNfft, weighting, detrendOpt,
                        plotOn, verbose)

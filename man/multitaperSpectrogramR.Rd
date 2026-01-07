@@ -32,10 +32,10 @@ c(0, nyquist) later)}
 \item{timeBandwidth}{(numeric): time-half bandwidth product (window duration\emph{half bandwidth of main lobe)
 (default: 5 Hz}s)}
 
-\item{numTapers}{(numeric): number of DPSS tapers to use (default: NULL \link[=will be computed
-as floor(2*time_bandwidth - 1)]{will be computed as floor(2*time_bandwidth - 1)})}
+\item{numTapers}{(numeric): number of DPSS tapers to use (default: NULL will be computed
+as floor(2*time_bandwidth - 1))}
 
-\item{windowParams}{(numeric vector): c(window size (seconds), step size (seconds)) (default: \link{5 1})}
+\item{windowParams}{(numeric vector): c(window size (seconds), step size (seconds)) (default: 5 1)}
 
 \item{minNfft}{(numeric) minimum allowable NFFT size, adds zero padding for interpolation (closest 2^x) (default: 0)}
 
@@ -45,7 +45,7 @@ as floor(2*time_bandwidth - 1)]{will be computed as floor(2*time_bandwidth - 1)}
 
 \item{parallel}{(logical): use parallel processing to speed up calculation (default: FALSE). Note: speedup is faster on}
 
-\item{numWorkers}{(logical): plot results (default: TRUE)}
+\item{numWorkers}{(logical): number of workers}
 
 \item{plotOn}{(logical): plot results (default: TRUE)}
 
@@ -80,7 +80,7 @@ timeWindow <- c(-10, 20)
 epoch <- Epoch(pt01EcoG)
 fs=1000
 timeNum <- ncol(epoch)
-windowParams = c(1, 0.2) 
+windowParams = c(1, 0.2)
 nwt=floor((timeNum/fs-windowParams[1])/windowParams[2])+1
 data   <- vector(mode="numeric", length=timeNum)
 data[1:timeNum]<-dataMat[sozIndex[1],1:timeNum]

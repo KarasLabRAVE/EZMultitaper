@@ -1,53 +1,17 @@
-isWholeNumber <- function(x) {
-    return(x %% 1 == 0)
-}
+
+# ---- Helpers ----
+`%||%` <- function(a, b) if (!is.null(a)) a else b
+label01 <- function(x) ifelse(toupper(trimws(x)) == "F", 1L, 0L)
 
 
-# Shifts to the right all strings of a list with a number of blanks
-shift <- \(strL, nBlanks = 0) {
-    pre <- paste(rep(" ", nBlanks), collapse = "")
-    lapply(strL, \(x) sprintf("%s%s", pre, x)) |> unlist()
+to_numeric_matrix <- function(x) {
+  x <- as.matrix(x)
+  storage.mode(x) <- "double"
+  dimnames(x) <- NULL
+  x
 }
 
-#' Check and keep valid index only
-#'
-#' @param indices Numeric or character index to check
-#' @param names Character. All names corresponding to the indices
-checkIndex <- function(indices, names) {
-    if (length(names) == 0) {
-        return()
-    }
-    if (length(indices) == 0) {
-        return()
-    }
-    if (is(indices, "numeric")) {
-        allIndices <- seq_along(names)
-        diffIndices <- setdiff(indices, allIndices)
-        indicesFiltered <- indices[!indices %in% diffIndices]
-        result <- indicesFiltered
-    } else {
-        diffIndices <- setdiff(indices, names)
-        indicesFiltered <- indices[!indices %in% diffIndices]
-        result <- which(names %in% indicesFiltered)
-    }
-    if (length(diffIndices)) {
-        indicesMissing <- paste(diffIndices, collapse = ", ")
-        indicesExist <- paste(indicesFiltered, collapse = ", ")
-        warning(
-            glue("Indices {indicesMissing} are out of range. I will keep the valid values {indicesExist}.")
-        )
-    }
-    result
-}
-
-# Try to convert a vector to numeric
-# If not possible, this does not raise a warning or error
-# but returns NULL
-tryToNum <- function(x) {
-    x <- tryCatch(as.numeric(x), error = function(e) x, warning = function(w) x)
-    if (is.numeric(x)) {
-        return(x)
-    } else {
-        return(NULL)
-    }
-}
+#pool score
+.clamp01 <- function(p) pmin(1 - 1e-6, pmax(1e-6, p))
+.logit   <- function(p) log(.clamp01(p) / (1 - .clamp01(p)))
+.invlogit<- function(x) 1 / (1 + exp(-x))
