@@ -116,3 +116,9 @@ powHeatmap <- function(heatmap, sozNames) {
 }
 
 powHeatmap(heatmap=MeanPowBandHeatmaps[[1]], sozNames=pt01sozName)
+
+
+## plot the mean band power distribution
+plotPowDistribution(pow = MeanPowBandHeatmaps[[1]], groupIndex = pt01sozName, bandType="SEM", rollingWindow = 1)
+
+plotPowQuantile(pow = MeanPowBandHeatmaps[[1]], groupIndex = pt01sozName)
